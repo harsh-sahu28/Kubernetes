@@ -1,0 +1,11 @@
+name: DevSecOps Pipeline
+
+on:
+    push: 
+        branches: [main, devsecops]
+
+jobs:
+    code:
+        runs-on: ubuntu-latest
+        steps:
+            - run: "echo 'Hello World'"
