@@ -2,6 +2,9 @@
 # automated-ollama-setup.sh
 # This script is designed to be used as AWS EC2 User Data for the AI Tier.
 
+# Export HOME for cloud-init environment to prevent Ollama panic
+export HOME=/root
+
 # 1. Install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
