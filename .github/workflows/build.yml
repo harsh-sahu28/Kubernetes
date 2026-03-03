@@ -10,7 +10,7 @@ permissions:
 jobs:
 
   # ============================================================
-  # GATE 3: BUILD
+  # GATE 5: BUILD
   # ============================================================
   build:
     name: Build & Package
@@ -36,7 +36,7 @@ jobs:
           path: target/*.jar
 
   # ============================================================
-  # GATE 4: CONTAINER IMAGE SCAN - Trivy
+  # GATE 6: CONTAINER IMAGE SCAN - Trivy
   # ============================================================
   image_scan:
     name: Container Scan - Trivy
@@ -77,7 +77,7 @@ jobs:
           path: trivy-report.txt
 
   # ============================================================
-  # GATE 5: PUSH TO ECR
+  # GATE 7: PUSH TO ECR
   # ============================================================
   push_to_ecr:
     name: Push to ECR

@@ -10,7 +10,7 @@ permissions:
 jobs:
 
   # ============================================================
-  # GATE 6: DEPLOY
+  # GATE 8: DEPLOY
   # ============================================================
   deploy:
     name: Deploy to EC2 via SSH
@@ -70,7 +70,7 @@ jobs:
             docker compose -f app-tier.yml up -d --build
 
   # ============================================================
-  # GATE 7: DAST - Dynamic Application Security Testing
+  # GATE 9: DAST - Dynamic Application Security Testing
   # ============================================================
   dast:
     name: DAST - OWASP ZAP Baseline Scan

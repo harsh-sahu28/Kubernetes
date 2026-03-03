@@ -65,17 +65,19 @@ graph TD
 
 ## Security Pipeline (DevSecOps Pipeline)
 
-The CI/CD pipeline enforces **7 sequential security gates** before any code reaches production:
+The CI/CD pipeline enforces **9 sequential security gates** before any code reaches production:
 
 | Gate | Name | Tool | Purpose |
 | :---: | :--- | :--- | :--- |
-| 1 | SAST | Semgrep | Scans Java source code for security flaws and OWASP Top 10 |
-| 2 | SCA | OWASP Dependency Check (first time run can take more than 30+ minutes) | Scans Maven dependencies for known CVEs |
-| 3 | Build | Maven | Compiles and packages the application |
-| 4 | Container Scan | Trivy | Scans the Docker image for OS and library vulnerabilities |
-| 5 | Push | Amazon ECR | Pushes the image only after Trivy passes |
-| 6 | Deploy | SSH / Docker Compose | Deploys the verified image to EC2 |
-| 7 | DAST | OWASP ZAP | Scans the live application for runtime web vulnerabilities |
+| 1 | Secret Scan | Gitleaks | Scans entire Git history for leaked secrets |
+| 2 | Lint | Checkstyle | Enforces Java Google-Style coding standards |
+| 3 | SAST | Semgrep | Scans Java source code for security flaws and OWASP Top 10 |
+| 4 | SCA | OWASP Dependency Check (first time run can take more than 30+ minutes) | Scans Maven dependencies for known CVEs |
+| 5 | Build | Maven | Compiles and packages the application |
+| 6 | Container Scan | Trivy | Scans the Docker image for OS and library vulnerabilities |
+| 7 | Push | Amazon ECR | Pushes the image only after Trivy passes |
+| 8 | Deploy | SSH / Docker Compose | Automated deployment to AWS EC2 |
+| 9 | DAST | OWASP ZAP | Dynamic attack surface scanning on live app |
 
 ---
 
@@ -290,17 +292,19 @@ Configure the following Action Secrets within your GitHub repository settings:
 
 ## Continuous Integration and Deployment
 
-The DevSecOps lifecycle is orchestrated through the [DevSecOps Main Pipeline](.github/workflows/devsecops-main.yml), which securely sequences three modular workflows: [CI](.github/workflows/ci.yml), [Build](.github/workflows/build.yml), and [CD](.github/workflows/cd.yml). Together they enforce **7 sequential security gates** before any code reaches production. Every `git push` to the `main` or `devsecops` branch triggers the full pipeline automatically.
+The DevSecOps lifecycle is orchestrated through the [DevSecOps Main Pipeline](.github/workflows/devsecops-main.yml), which securely sequences three modular workflows: [CI](.github/workflows/ci.yml), [Build](.github/workflows/build.yml), and [CD](.github/workflows/cd.yml). Together they enforce **9 sequential security gates** before any code reaches production. Every `git push` to the `main` or `devsecops` branch triggers the full pipeline automatically.
 
 | Gate | Job | Tool | Action |
 | :---: | :--- | :--- | :--- |
-| 1 | `sast` | Semgrep | **Enforced**: Scans Java code for OWASP Top 10. Fails pipeline on any Critical finding. |
-| 2 | `sca` | OWASP Dependency Check | **Enforced**: Scans `pom.xml` for CVEs. Fails on CVSS score >= 7. |
-| 3 | `build` | Maven | Compiles and packages the application. Runs only after Gates 1 & 2 pass. |
-| 4 | `image_scan` | Trivy | **Enforced**: Scans Docker image layers. Fails on any High/Critical CVE. |
-| 5 | `push_to_ecr` | Amazon ECR | Pushes the verified image to AWS ECR using OIDC. |
-| 6 | `deploy` | SSH / Docker Compose | Fetches secrets from AWS Secrets Manager and recreates the container. |
-| 7 | `dast` | OWASP ZAP | **Audit Mode**: Comprehensive scan that reports findings as artifacts, but does not block the pipeline. |
+| 1 | `gitleaks` | Gitleaks | **Strict**: Fails if any secrets are found in history. |
+| 2 | `lint` | Checkstyle | **Audit**: Reports style violations but doesn't block (Google Style). |
+| 3 | `sast` | Semgrep | **Strict**: Scans code for vulnerabilities. Fails on findings. |
+| 4 | `sca` | OWASP Dependency Check | **Strict**: Fails if any dependency has CVSS > 7.0. |
+| 5 | `build` | Maven | Standard build and test stage. |
+| 6 | `image_scan` | Trivy | **Strict**: Scans Docker image layers. Fails on any High/Critical CVE. |
+| 7 | `push_to_ecr` | Amazon ECR | Pushes the verified image to AWS ECR using OIDC. |
+| 8 | `deploy` | SSH / Docker Compose | Fetches secrets from AWS Secrets Manager and recreates the container. |
+| 9 | `dast` | OWASP ZAP | **Audit Mode**: Comprehensive scan that reports findings as artifacts, but does not block the pipeline. |
 
 All scan reports (OWASP, Trivy, ZAP) are uploaded as downloadable **Artifacts** in each GitHub Actions run, YOu can look into the **Artifacts**.
 
