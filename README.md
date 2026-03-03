@@ -187,7 +187,7 @@ The deployment pipeline utilizes OpenID Connect (OIDC) for secure, keyless authe
 ### Phase 4: Secrets and Pipeline Configuration
 
 #### 1. AWS Secrets Manager
-Create a secret named `bankapp/prod-secrets` with the following key-value pairs:
+Create a secret named `bankapp/prod-secrets` in `Other type of secret` with the following key-value pairs:
 
 | Secret Key | Description |
 | :--- | :--- |
